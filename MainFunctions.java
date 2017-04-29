@@ -110,6 +110,7 @@ public class MainFunctions {
     		//Get the host to store the tuple by hashing and send the "out tuple" request to corresponding host
     		int hostId = Hash.md5(strToIn, hostNumber);
 	    	String[] targetInfo = hosts.get(hostId).split(" ");
+	    	
 	    	int backupId = Utils.getBackupId(hostId, hostNumber);
     		String[] backupHostInfo = hosts.get(backupId).split(" ");
 
@@ -118,8 +119,10 @@ public class MainFunctions {
     			while(!client.rdo(targetInfo[1], targetInfo[2], strToIn)) {
     				Thread.sleep(1000);
 	    		}
+    			System.out.println("The tuple will be removed from: " + targetInfo[0]);
     			client.ino(targetInfo[1], targetInfo[2], strToIn);
     			if(Utils.checkServerStatus(backupHostInfo[1], backupHostInfo[2])) {
+    				System.out.println("The tuple will be also removed from backup: " + backupHostInfo[0]);
     				client.inBackup(backupHostInfo[1], backupHostInfo[2], strToIn);
     			}
     		}else{
@@ -127,6 +130,7 @@ public class MainFunctions {
     				Thread.sleep(1000);
 	    		}
     			System.out.println("connection to original failed and try to connect to backup host");
+    			System.out.println("The tuple will be removed from backup: " + backupHostInfo[0]);
     			client.inBackup(backupHostInfo[1], backupHostInfo[2], strToIn);
     		}
     	}else{
@@ -139,9 +143,8 @@ public class MainFunctions {
     		SharedInfo sharedInfo = new SharedInfo();
     		Utils.broadCast(netsPath, hostNumber, broadcastThread, sharedInfo, strToIn);
     		
-    		ArrayList<String> hosts = Utils.getAllHostInfoIntoList(netsPath);
-    		int hostId = getHostId(hosts, sharedInfo.hostName);
-    		int backupId =  getBackupId(hostId, hosts.size());
+    		int hostId = Restart.getHostId(hosts, sharedInfo.hostName);
+    		int backupId =  Utils.getBackupId(hostId, hosts.size());
     		String[] backupHostInfo = hosts.get(backupId).split(" ");
     		
 			Client client = new Client();
@@ -150,7 +153,8 @@ public class MainFunctions {
 				System.out.println("The tuple will be removed from: " + sharedInfo.hostName);
 				client.ino(sharedInfo.hostAddress, sharedInfo.port, sharedInfo.tuples);
 				if(Utils.checkServerStatus(backupHostInfo[1], backupHostInfo[2])) {
-    				client.inBackup(backupHostInfo[1], backupHostInfo[2], strToIn);
+					System.out.println("The tuple will be also removed from backup: " + backupHostInfo[0]);
+    				client.inBackup(backupHostInfo[1], backupHostInfo[2], sharedInfo.tuples);
     			}
 			}else{
 				System.out.println("The tuple will be removed from backup: " + sharedInfo.hostName);

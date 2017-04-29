@@ -186,9 +186,6 @@ public class Client {
 			tuples = "ino" + tuples;
 			DataOutputStream out = new DataOutputStream(client.getOutputStream());
 			out.writeUTF(tuples);
-			InputStream inFromServer = client.getInputStream();
-			DataInputStream in = new DataInputStream(inFromServer);
-			System.out.println(in.readUTF());
 			client.close();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -204,9 +201,6 @@ public class Client {
 			tuples = "inu" + tuples;
 			DataOutputStream out = new DataOutputStream(client.getOutputStream());
 			out.writeUTF(tuples);
-			InputStream inFromServer = client.getInputStream();
-			DataInputStream in = new DataInputStream(inFromServer);
-			System.out.println(in.readUTF());
 			client.close();
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
