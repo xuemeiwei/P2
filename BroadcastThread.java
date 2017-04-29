@@ -11,12 +11,14 @@ import java.net.UnknownHostException;
 public class BroadcastThread extends Thread{
 	public SharedInfo sharedInfo;
 //	boolean flag = false;
+	private String hostName = null;
 	private String hostAddress = null;
 	private String port = null;
 	String tuples;
 	private String host;
-	BroadcastThread(SharedInfo sharedInfo, String hostAddress, String port, String tuples, String original) {
+	BroadcastThread(SharedInfo sharedInfo, String hostName, String hostAddress, String port, String tuples, String original) {
 		this.sharedInfo = sharedInfo;
+		this.hostName = hostName;
 		this.hostAddress = hostAddress;
 		this.port = port;
 		this.tuples = tuples;
@@ -45,9 +47,9 @@ public class BroadcastThread extends Thread{
 				// Since the "set" method is synchronized, only one host can set it at one time;
 				if(!cmd.equals("")) {
 					if(tuples.startsWith("bro")) {
-						sharedInfo.set("original",hostAddress, port, cmd);
+						sharedInfo.set("original", hostName, hostAddress, port, cmd);
 					}else{
-						sharedInfo.set("backup",hostAddress, port, cmd);
+						sharedInfo.set("backup", hostName, hostAddress, port, cmd);
 					}
 				}
 				message.close();

@@ -7,11 +7,14 @@
  */
 public class SharedInfo {
 	String flag = ""; // mark whether one of the hosts has the tuple;
+	String hostName = "";
 	String hostAddress = null;//which host is chosen to remove the tuple;
 	String port = null;//corresponding port;
 	String tuples = "";
-	public synchronized void set(String flag, String hostAddress, String port, String tuples) {
+	
+	public synchronized void set(String flag, String hostName, String hostAddress, String port, String tuples) {
 		this.flag = flag;
+		this.hostName = hostName;
 		this.hostAddress = hostAddress;
 		this.port = port;
 		this.tuples = tuples;

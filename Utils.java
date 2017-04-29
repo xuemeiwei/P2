@@ -176,14 +176,15 @@ public class Utils {
 		ArrayList<String> allHosts =  getAllHostInfoIntoList(netsPath);
 		for(int i = 0; i < allHosts.size(); ++i) {
 			String[] strs = allHosts.get(i).split(" ");
+			String otherHostName = strs[0];
     		String otherHostIP = strs[1];
     		String otherHostPortNumber = strs[2];
     		if(!Utils.checkServerStatus(otherHostIP, otherHostPortNumber)) {
     			int backupId = getBackupId(i, allHosts.size());
     			String[] backupInfo = allHosts.get(backupId).split(" ");
-    			broadcastThread[i] = new BroadcastThread(sharedInfo, backupInfo[1], backupInfo[2], strToIn, "backup");
+    			broadcastThread[i] = new BroadcastThread(sharedInfo, backupInfo[0], backupInfo[1], backupInfo[2], strToIn, "backup");
     		}else{
-    			broadcastThread[i] = new BroadcastThread(sharedInfo, otherHostIP, otherHostPortNumber, strToIn, "original");
+    			broadcastThread[i] = new BroadcastThread(sharedInfo, otherHostName, otherHostIP, otherHostPortNumber, strToIn, "original");
     		}
 		}
 		

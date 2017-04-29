@@ -9,7 +9,7 @@ public class MainFunctions {
 		allHosts.add(hostName + " " + hostAddress + " " + port);
 		String[] newHostInfo = Utils.getAddHostsInfo(command);//stored as {[h1, a1, p1], [h2, a2, p2]}
 		Client client = new Client();
-		
+
 		for(int i = 0; i < newHostInfo.length; ++i) {
 			String[] currentHostInfo = newHostInfo[i].split(" ");
 			String netsFile = client.getNetsfile(currentHostInfo[1], currentHostInfo[2]);
@@ -39,16 +39,16 @@ public class MainFunctions {
 		String[] hostsToBeDeleted =  Utils.getDeleteHostsInfo(command);
     	Set<String> allHosts = Utils.getAllHostInfoIntoSet(netsPath);
     	int hostNumber = allHosts.size();
-    	
+
     	if(hostNumber == 1) {
     		System.out.println("Only one host remains and it can't be deleted");
     	}else{
     		int newHostNumber = hostNumber - hostsToBeDeleted.length;
 	    	System.out.println("newHostNumber: " + newHostNumber);
-    		
+
 	    	ArrayList<String> hostsArray = new ArrayList<>();
 			String[] dataTobeAllocated = Utils.getDataTobeAllocated(allHosts, hostsArray, newHostNumber);
-			
+
 			Client client = new Client();
 	    	String remainNetsFile = "";
 	    	ArrayList<String> remainHosts = new ArrayList<>();
@@ -83,12 +83,12 @@ public class MainFunctions {
 		int hostNumber = Utils.getHostNumber(netsPath);
     	ArrayList<String> hosts = Utils.getAllHostInfoIntoList(netsPath);
     	String strToOut = Utils.preprocess(command);//get the string to store
-    	
+
     	int hostId = Hash.md5(strToOut, hostNumber);
     	String[] targetInfo = hosts.get(hostId).split(" ");
 		int backupId = Utils.getBackupId(hostId, hostNumber);
 		String[] backupHostInfo = hosts.get(backupId).split(" ");
-		
+
 		Client client = new Client();
 		if(Utils.checkServerStatus(targetInfo[1], targetInfo[2])) {
 			client.out(targetInfo[1], targetInfo[2], strToOut);
@@ -105,14 +105,14 @@ public class MainFunctions {
 		int hostNumber = Utils.getHostNumber(netsPath);
     	ArrayList<String> hosts = Utils.getAllHostInfoIntoList(netsPath);
     	String strToIn = Utils.preprocess(command);//get the string to delete
-    	
+
     	if(!strToIn.contains("?")) {//If exact match
     		//Get the host to store the tuple by hashing and send the "out tuple" request to corresponding host
     		int hostId = Hash.md5(strToIn, hostNumber);
 	    	String[] targetInfo = hosts.get(hostId).split(" ");
 	    	int backupId = Utils.getBackupId(hostId, hostNumber);
     		String[] backupHostInfo = hosts.get(backupId).split(" ");
-    		
+
     		Client client = new Client();
     		if(Utils.checkServerStatus(targetInfo[1], targetInfo[2])) {
     			while(!client.rdo(targetInfo[1], targetInfo[2], strToIn)) {
@@ -130,7 +130,7 @@ public class MainFunctions {
     			client.inBackup(backupHostInfo[1], backupHostInfo[2], strToIn);
     		}
     	}else{
-    		/* Create n threads to broadcast the message to all the hosts. 
+    		/* Create n threads to broadcast the message to all the hosts.
     		 * If not found, current host will block, waiting for available tuple at all the hosts.
     		 * If found, random host will be chosen and send back the host machine to current host
     		 * Then current machine will delete the tuple
@@ -139,13 +139,21 @@ public class MainFunctions {
     		SharedInfo sharedInfo = new SharedInfo();
     		Utils.broadCast(netsPath, hostNumber, broadcastThread, sharedInfo, strToIn);
     		
+    		ArrayList<String> hosts = Utils.getAllHostInfoIntoList(netsPath);
+    		int hostId = getHostId(hosts, sharedInfo.hostName);
+    		int backupId =  getBackupId(hostId, hosts.size());
+    		String[] backupHostInfo = hosts.get(backupId).split(" ");
+    		
 			Client client = new Client();
 			System.out.println("The tuple to be deleted is: [" + sharedInfo.tuples + "]");
 			if(sharedInfo.flag.equals("original")) {
-				System.out.println("The tuple will be removed from: " + sharedInfo.hostAddress + ". Port number is: " + sharedInfo.port);
+				System.out.println("The tuple will be removed from: " + sharedInfo.hostName);
 				client.ino(sharedInfo.hostAddress, sharedInfo.port, sharedInfo.tuples);
+				if(Utils.checkServerStatus(backupHostInfo[1], backupHostInfo[2])) {
+    				client.inBackup(backupHostInfo[1], backupHostInfo[2], strToIn);
+    			}
 			}else{
-				System.out.println("The tuple will be removed from backup: " + sharedInfo.hostAddress + ". Port number is: " + sharedInfo.port);
+				System.out.println("The tuple will be removed from backup: " + sharedInfo.hostName);
 				client.inBackup(sharedInfo.hostAddress, sharedInfo.port, sharedInfo.tuples);
 			}
     	}
@@ -155,14 +163,14 @@ public class MainFunctions {
 		int hostNumber = Utils.getHostNumber(netsPath);
     	ArrayList<String> hosts = Utils.getAllHostInfoIntoList(netsPath);
     	String strToRd = Utils.preprocess(command);//get the string to read
-    	
+
     	if(!strToRd.contains("?")) {
     		//Get the host to store the tuple by hashing and send the "out tuple" request to corresponding host
     		int hostId = Hash.md5(strToRd, hostNumber);
 	    	String[] targetInfo = hosts.get(hostId).split(" ");
     		int backupId = Utils.getBackupId(hostId, hostNumber);
     		String[] backupHostInfo = hosts.get(backupId).split(" ");
-    		
+
     		Client client = new Client();
     		if(Utils.checkServerStatus(targetInfo[1], targetInfo[2])) {
     			while(!client.rdo(targetInfo[1], targetInfo[2], strToRd)) {
@@ -180,10 +188,11 @@ public class MainFunctions {
     		Thread[] broadcastThread = new BroadcastThread[hostNumber];
     		SharedInfo sharedInfo = new SharedInfo();
     		Utils.broadCast(netsPath, hostNumber, broadcastThread, sharedInfo, strToRd);
+            System.out.println("The tuple to be read is: [" + sharedInfo.tuples + "]");
     		if(sharedInfo.flag.equals("original")) {
-				System.out.println("The tuple will be read from: " + sharedInfo.hostAddress + ". Port number is: " + sharedInfo.port);
+				System.out.println("The tuple will be read from: " + sharedInfo.hostName);
 			}else{
-				System.out.println("The tuple will be read from backup: " + sharedInfo.hostAddress + ". Port number is: " + sharedInfo.port);
+				System.out.println("The tuple will be read from backup: " + sharedInfo.hostName);
 			}
     	}
 	}
