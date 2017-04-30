@@ -8,6 +8,23 @@ public class ErrorHandle {
 			if(command.lastIndexOf("(") >= command.lastIndexOf(")")) {
 				return false;
 			}
+			String[] strs = command.split("\\(");
+			for(int i = 1; i < strs.length; ++i) {
+				String tmp = strs[i].trim();
+				String[] host = tmp.split(",");
+				if(host.length != 3) {
+					return false;
+				}
+				String[] IP = host[1].split("\\.");
+				if(IP.length != 4) {
+					return false;
+				}
+				for(int j = 0; j < 3; j++) {
+					if(Integer.valueOf(IP[j].trim()) > 255 || Integer.valueOf(IP[j].trim()) < 0) {
+						return false;
+					}
+				}
+			}
 			return true;
 		}
 		if(command.startsWith("delete")) {
