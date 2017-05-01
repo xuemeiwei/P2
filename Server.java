@@ -128,6 +128,7 @@ public class Server extends Thread {
 		    	DataOutputStream out = new DataOutputStream(server.getOutputStream());
 		    	out.writeUTF(hostName);
 		    	server.close();
+		    	System.out.println("This host has been deleted");
 		    	continue;
             }
             
