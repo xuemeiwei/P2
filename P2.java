@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 
+
 public class P2 {
 	static String hostName;
 	static String hostAddress;
@@ -41,6 +42,7 @@ public class P2 {
 		String tuplesPath = dirPath+ "/tuples.txt";
 		String backupPath = dirPath+ "/backup.txt";
 		
+		//
 		File file = new File(dirPath);
 		if(file.exists()) {
 			System.out.println("It's an old Machine");
@@ -60,13 +62,25 @@ public class P2 {
 			
 		}else{
 			System.out.println("It's a new Machine");
+			file = new File("/tmp/xwei1/linda/");
 			file.mkdirs();
-	 	    file = new File(netsPath);
-	 	    file.createNewFile();
-	 	    file = new File(tuplesPath);
-	 	    file.createNewFile();
-		    file = new File(backupPath);
-		    file.createNewFile();
+			Utils.chmod(file,true,true,true);	//directory
+			
+			file = new File("/tmp/xwei1/linda/" + hostName);
+			file.mkdirs();
+			Utils.chmod(file,true,true,true);	//directory
+			
+			file = new File(netsPath);
+			file.createNewFile();
+			Utils.chmod(file,false,true,true);	//file
+			
+			file = new File(tuplesPath);
+			file.createNewFile();
+			Utils.chmod(file,false,true,true);	//file
+			
+			file = new File(backupPath);
+			file.createNewFile();
+			Utils.chmod(file,false,true,true);	//file
 		}
 		
 	    /****************Start Server******************/
@@ -117,5 +131,7 @@ public class P2 {
 	    }
 	    
 	}
+	
+	
 	
 }

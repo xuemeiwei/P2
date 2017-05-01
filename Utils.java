@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -212,4 +213,16 @@ public class Utils {
 		}
 		return true;
 	}
+	
+	/**
+	 * File: target file
+	 * 777: true true true  - directories.
+	 * 666: false,true,true - files.
+	 */
+	public static void chmod(File file, boolean executable, boolean readable, boolean writable) {
+		file.setExecutable(executable,false);
+		file.setReadable(readable,false);
+		file.setWritable(writable, false);
+	}
+	
 }
