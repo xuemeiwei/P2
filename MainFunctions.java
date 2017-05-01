@@ -110,7 +110,7 @@ public class MainFunctions {
     		//Get the host to store the tuple by hashing and send the "out tuple" request to corresponding host
     		int hostId = Hash.md5(strToIn, hostNumber);
 	    	String[] targetInfo = hosts.get(hostId).split(" ");
-	    	
+
 	    	int backupId = Utils.getBackupId(hostId, hostNumber);
     		String[] backupHostInfo = hosts.get(backupId).split(" ");
 
@@ -142,11 +142,11 @@ public class MainFunctions {
     		Thread[] broadcastThread = new BroadcastThread[hostNumber];
     		SharedInfo sharedInfo = new SharedInfo();
     		Utils.broadCast(netsPath, hostNumber, broadcastThread, sharedInfo, strToIn);
-    		
+
     		int hostId = Restart.getHostId(hosts, sharedInfo.hostName);
     		int backupId =  Utils.getBackupId(hostId, hosts.size());
     		String[] backupHostInfo = hosts.get(backupId).split(" ");
-    		
+
 			Client client = new Client();
 			System.out.println("The tuple to be deleted is: [" + sharedInfo.tuples + "]");
 			if(sharedInfo.flag.equals("original")) {

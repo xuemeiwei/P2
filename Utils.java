@@ -81,7 +81,7 @@ public class Utils {
 			return (hostId + 2) % hostNumber;
 		}
 	}
-	
+
 	//Update the original tuples from backup host
 	public static void updateTuplesFile(String tuplesPath, String otherHostAddress, String otherHostPort) throws IOException {
 		Client client = new Client();
@@ -91,7 +91,7 @@ public class Utils {
 		bw.write(netsFile);
 		bw.close();
 	}
-	
+
 	//Update the backup tuples from original host
 	public static void updateBackupFile(String backupPath, String otherHostAddress, String otherHostPort)  throws IOException{
 		Client client = new Client();
@@ -101,7 +101,7 @@ public class Utils {
 		bw.write(netsFile);
 		bw.close();
 	}
-	
+
 	//Get the add hosts information from command
 	public static String[] getAddHostsInfo(String command) {
 		String[] tmp = command.split("\\(");
@@ -114,7 +114,7 @@ public class Utils {
 		}
 		return newHostsInfo;
 	}
-	
+
 	//Get the delete hosts information from command
 	public static String[] getDeleteHostsInfo(String command) {
 		int start = command.indexOf('(');
@@ -127,7 +127,7 @@ public class Utils {
 		}
 		return deleteHostsInfo;
 	}
-	
+
 	//Get all the data to be allocated from all the hosts
 	public static String[] getDataTobeAllocated(Set<String> hosts, ArrayList<String> hostsArray, int hostNumber) {
 		Client client = new Client();
@@ -141,7 +141,7 @@ public class Utils {
     		String tuplesOnHost = client.getTuplesFile(hostInfo[1], hostInfo[2]);
     		String[] tuples = tuplesOnHost.split("\n");
     		for(String tuple: tuples) {
-    			if(!tuple.equals("\n") && tuples != null) {
+    			if(!tuple.equals("\n") && tuples != null && !tuple.equals("")) {
     				int hostId = Hash.md5(tuple, hostNumber);
     				dataTobeAllocated[hostId] += tuple + "\n";
     			}
@@ -149,7 +149,7 @@ public class Utils {
 		}
 		return dataTobeAllocated;
 	}
-	
+
 	//Get the netsfile string from the host list
 	public static String getAllNetsFile(ArrayList<String> hostsArray) {
 		String netsFile = "";
@@ -158,7 +158,7 @@ public class Utils {
 		}
 		return netsFile;
 	}
-	
+
 	// Process the command
 	public static String preprocess(String command){
 		int start = command.indexOf('(');
@@ -171,7 +171,7 @@ public class Utils {
 		}
 		return res;
 	}
-	
+
 	//Broadcast the tuples to all hosts
 	public static void broadCast(String netsPath, int hostNumber, Thread[] broadcastThread, SharedInfo sharedInfo, String strToIn) throws IOException, InterruptedException {
 		ArrayList<String> allHosts =  getAllHostInfoIntoList(netsPath);
@@ -188,7 +188,7 @@ public class Utils {
     			broadcastThread[i] = new BroadcastThread(sharedInfo, otherHostName, otherHostIP, otherHostPortNumber, strToIn, "original");
     		}
 		}
-		
+
 		// start all the threads
 		for(int i = 0; i < hostNumber; ++i) {
 			broadcastThread[i].start();
@@ -198,7 +198,7 @@ public class Utils {
 			Thread.sleep(2000);
 		}
 	}
-	
+
 	//Check whether the server is working or not
 	public static boolean checkServerStatus(String hostAddress, String portNumber) {
 		try {
@@ -213,7 +213,7 @@ public class Utils {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * File: target file
 	 * 777: true true true  - directories.
@@ -224,5 +224,5 @@ public class Utils {
 		file.setReadable(readable,false);
 		file.setWritable(writable, false);
 	}
-	
+
 }
